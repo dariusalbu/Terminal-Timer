@@ -1,0 +1,3 @@
+/home/darius/code/projects/build/CMakeFiles/ttimer.dir
+/home/darius/code/projects/build/CMakeFiles/edit_cache.dir
+/home/darius/code/projects/build/CMakeFiles/rebuild_cache.dir
