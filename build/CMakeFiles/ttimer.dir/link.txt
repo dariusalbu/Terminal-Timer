@@ -1,1 +1,0 @@
-/usr/bin/cc CMakeFiles/ttimer.dir/ttimer.c.o -o ttimer  -lcurses /usr/lib/x86_64-linux-gnu/libform.so -lm -lpthread -ldl 
