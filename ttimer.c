@@ -132,7 +132,7 @@ void timer(int *hours, int *minutes, int *seconds) {
     mvwprintw(clock_window, 1, 1, "DONE!");
     mvprintw(LINES - 1, 0, "Press any key to exit...");     //write at the bottom of window
     wrefresh(clock_window);
-    ma_engine_play_sound(&engine, "51169__rutgermuller__telephone-placed-in-dock-beep.wav", NULL);   //add your path to a finish sound
+    ma_engine_play_sound(&engine, "alarm.wav", NULL);   //add your path to a finish sound
     delwin(clock_window);
     curs_set(1);
     refresh();

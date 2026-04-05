@@ -21,7 +21,19 @@ A lightweight, cross-platform productivity timer for the terminal. Built with C 
 * **C Compiler** (GCC, Clang, or MSVC)
 * **Libraries**:
   * Linux: `libncurses-dev`
+    * How to install(Ubuntu/Debian):
+      ```bash
+      gcc ttimer.c -o ttimer -lncurses -lpthread
+      ```
   * Windows: `PDCurses`
+    * This project requires PDCurses to run natively on Windows.
+    * How to install(using vcpkg):
+    1. Install [vcpkg](https://github.com/microsoft/vcpkg)
+    2. Install the library:
+        ```powershell
+        vcpkg install pdcurses:x64-windows
+        vcpkg integrate install
+        ```
 
 ### 2. Build Instructions
 
