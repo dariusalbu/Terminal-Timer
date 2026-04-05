@@ -9,15 +9,11 @@
 #else
     #include <ncurses.h>
     #include <menu.h>
-    #include <signal.h>
 #endif
-
+    
+#include <signal.h>
 #include <panel.h>
 #include "miniaudio.h"
-
-#ifndef _WIN32
-    #include <menu.h>
-#endif
 
 ma_engine engine;
 
@@ -32,18 +28,19 @@ void timer(int *hours, int *minutes, int *seconds);
 int main() {
     initscr();
 
-    int hours = 0, minutes = 50, seconds = 0;   //default values(I work the best with these values)
+    int hours = 0, minutes = 25, seconds = 0;   //default values(I work the best with these values)
 
     operation(&hours, &minutes, &seconds);
+    int hours_todo = hours, minutes_todo = minutes, seconds_todo = seconds;
     timer(&hours, &minutes, &seconds);
     
     getch();
     endwin();
     
     if (hours == 0 && minutes == 0 && seconds < 1) {  //timer stop when seconds reach -1, also there is a case when timer can be stopped at 1sec to display 0 0 0 remaining time, this is why I test seconds < 1 here
-        printf("Timer complete!\n");
+        printf("Timer complete!\nDuration: %dh %dm %ds\n", hours_todo, minutes_todo, seconds_todo);
     } else {
-        printf("Timer stopped! Remaining time: %dh %dm %ds\n", hours, minutes, seconds);
+        printf("Timer stopped!\nRemaining time: %dh %dm %ds\n", hours, minutes, seconds);
     }
     
     return 0;
@@ -52,7 +49,7 @@ int main() {
 void operation(int *hours, int *minutes, int *seconds) {
     int command = 0;
     
-    printw("Press 'e' to configure the timer or 'ENTER' to start default timer(50min): ");
+    printw("Press 'e' to configure the timer or 'ENTER' to start default timer(%dmin): ", *minutes);
     command = getch();
 
     if ((char)command == 'e' || (char)command == 'E') {
@@ -85,7 +82,9 @@ void timer(int *hours, int *minutes, int *seconds) {
     clock_window = newwin(3, 10, (LINES - 3) / 2, (COLS - 10) / 2);
     wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    signal(SIGWINCH, handle_winch);
+    #ifndef _WIN32
+        signal(SIGWINCH, handle_winch);
+    #endif
     nodelay(stdscr, TRUE);  //nodelay to be able to get 'q' or 'Q' keys when wanting to exit the timer
     while (*hours >= 0 && *minutes >= 0 && *seconds >= 0) {
         if (need_resize != 0) {
