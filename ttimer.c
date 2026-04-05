@@ -4,14 +4,20 @@
 
 #ifdef _WIN32
     #include <curses.h> // library for windows
+    #undef MOUSE_MOVED
+    #include <windows.h>
 #else
     #include <ncurses.h>
+    #include <menu.h>
+    #include <signal.h>
 #endif
 
 #include <panel.h>
-#include <menu.h>
-#include <signal.h>
 #include "miniaudio.h"
+
+#ifndef _WIN32
+    #include <menu.h>
+#endif
 
 ma_engine engine;
 
