@@ -82,22 +82,36 @@ void timer(int *hours, int *minutes, int *seconds) {
     clock_window = newwin(3, 10, (LINES - 3) / 2, (COLS - 10) / 2);
     wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    #ifndef _WIN32
-        signal(SIGWINCH, handle_winch);
+    #ifdef _WIN32
+        resize_term(0, 0);
     #endif
+
     nodelay(stdscr, TRUE);  //nodelay to be able to get 'q' or 'Q' keys when wanting to exit the timer
     while (*hours >= 0 && *minutes >= 0 && *seconds >= 0) {
-        if (need_resize != 0) {
-            need_resize = 0;
-            endwin();
-            refresh();
-            clear();
-            // Move window to a new position
-            wclear(clock_window);
-            wrefresh(clock_window);
-            mvwin(clock_window, (LINES - 3) / 2, (COLS - 10) / 2);
-            wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
-        }
+        #ifdef _WIN32
+            if (is_termresized()) {
+                resize_term(0, 0);
+                wresize(clock_window, 3, 10);
+                wclear(stdscr);
+                wrefresh(stdscr);
+                wclear(clock_window);
+                mvwin(clock_window, (LINES - 3) / 2, (COLS - 10) / 2);
+                wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
+                wrefresh(clock_window);
+            }
+        #else
+            if (need_resize != 0) {
+                need_resize = 0;
+                endwin();
+                refresh();
+                clear();
+                wclear(clock_window);
+                wrefresh(clock_window);
+                mvwin(clock_window, (LINES - 3) / 2, (COLS - 10) / 2);
+                wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
+            }
+        #endif
+
         int ch = getch();
         if ((char)ch == 'q' || (char)ch == 'Q') {
             break;
