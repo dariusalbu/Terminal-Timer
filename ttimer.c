@@ -17,10 +17,12 @@
 
 ma_engine engine;
 
-volatile sig_atomic_t need_resize = 0;  //detect window resize
-void handle_winch(int sig) {
-    need_resize = 1;
-}
+#ifndef _WIN32
+    volatile sig_atomic_t need_resize = 0;  //detect window resize
+    void handle_winch(int sig) {
+        need_resize = 1;
+    }
+#endif
 
 void operation(int *hours, int *minutes, int *seconds);   //testing if we use default timer or a edited one
 void timer(int *hours, int *minutes, int *seconds);
@@ -79,7 +81,7 @@ void timer(int *hours, int *minutes, int *seconds) {
     noecho(); 
     curs_set(0);
 
-    #ifndef _WIN_32
+    #ifndef _WIN32
         signal(SIGWINCH, handle_winch);
     #endif
 
@@ -123,16 +125,6 @@ void timer(int *hours, int *minutes, int *seconds) {
         int ch = getch();
         if ((char)ch == 'q' || (char)ch == 'Q') {
             break;
-        } else if ((char)ch == 'p' || (char)ch == 'P') {
-            nodelay(stdscr, FALSE);
-            wclear(clock_window);
-            mvwprintw(clock_window, 1, 1, "PAUSE...");
-            wrefresh(clock_window);
-            getch();
-            nodelay(stdscr, TRUE);
-            wclear(clock_window);
-            wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
-            wrefresh(clock_window);
         }
         if (*seconds == 0 && *minutes > 0) {
             *seconds = 59;
@@ -144,7 +136,37 @@ void timer(int *hours, int *minutes, int *seconds) {
         }
         mvwprintw(clock_window, 1, 1, "%02d:%02d:%02d", *hours, *minutes, *seconds);
         wrefresh(clock_window);
-        napms(1000);
+        for (int elapsed = 0; elapsed < 1000; elapsed += 50) {
+            napms(50);
+            int ch2 = getch();
+            if ((char)ch2 == 'q' || (char)ch2 == 'Q') { 
+                ch = ch2;
+                 break;
+            }
+            if ((char)ch2 == 'p' || (char)ch2 == 'P') {
+                 ch = ch2;
+                  break;
+            }
+            #ifndef _WIN32
+                if (need_resize) {
+                    break;
+                }
+            #endif
+        }
+        if ((char)ch == 'q' || (char)ch == 'Q') {
+            break;
+        }
+        if ((char)ch == 'p' || (char)ch == 'P') {
+            nodelay(stdscr, FALSE);
+            wclear(clock_window);
+            mvwprintw(clock_window, 1, 1, "PAUSE...");
+            wrefresh(clock_window);
+            getch();
+            nodelay(stdscr, TRUE);
+            wclear(clock_window);
+            wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
+            wrefresh(clock_window);
+        }
         (*seconds)--;
     }
     nodelay(stdscr, FALSE); 
