@@ -78,6 +78,11 @@ void timer(int *hours, int *minutes, int *seconds) {
 
     noecho(); 
     curs_set(0);
+
+    #ifndef _WIN_32
+        signal(SIGWINCH, handle_winch);
+    #endif
+
     WINDOW *clock_window;
     clock_window = newwin(3, 10, (LINES - 3) / 2, (COLS - 10) / 2);
     wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -104,11 +109,14 @@ void timer(int *hours, int *minutes, int *seconds) {
                 need_resize = 0;
                 endwin();
                 refresh();
+                resizeterm(0, 0);
                 clear();
+                refresh();
                 wclear(clock_window);
-                wrefresh(clock_window);
+                wresize(clock_window, 3, 10);
                 mvwin(clock_window, (LINES - 3) / 2, (COLS - 10) / 2);
                 wborder(clock_window, 0, 0, 0, 0, 0, 0, 0, 0);
+                wrefresh(clock_window);
             }
         #endif
 
